@@ -10,8 +10,8 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.testng:testng:7.4.0'
-    implementation 'org.seleniumhq.selenium:selenium-java:4.20.0'
+    implementation 'org.testng:testng:7.7.0'
+    implementation 'org.seleniumhq.selenium:selenium-java:3.20.0'
 
     compileOnly 'org.projectlombok:lombok:1.18.28'
     annotationProcessor 'org.projectlombok:lombok:1.18.28'
@@ -22,11 +22,42 @@ dependencies {
     implementation 'io.appium:java-client:7.6.0'
 
     implementation 'com.squareup.okhttp3:okhttp:4.9.0'
-
     implementation 'com.google.code.gson:gson:2.8.6'
-
+    implementation 'io.rest-assured:rest-assured:4.5.1'
 }
 
 test {
     useTestNG()
+}
+task qa (type:Test)
+{
+    useTestNG(){
+        def suite = System.getProperty('suite', '')
+
+        if (suite.equals('quick')) {
+            suites 'src/test/resources/quick.xml'
+        } else if (suite.equals('add')) {
+            suites 'src/test/resources/smoke.xml'
+        } else {
+            suites 'src/test/resources/testng.xml'
+        }
+    }
+
+    task scope(type:Test){
+        useTestNG(){
+            suites 'src/test/resources/scope.xml'
+        }
+    }
+
+    task team(type:Test){
+        useTestNG(){
+            def groups = System.getProperty('groups')
+            if (groups != null) {
+                includeGroups groups
+            }
+
+            suites 'src/test/resources/base.xml'
+        }
+    }
+
 }
